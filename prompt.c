@@ -305,7 +305,7 @@ void git_section() {
 			}
 			if (readp(upstream, 1, tmp, sizeof tmp) == 0) {
 				if (strcmp(tmp, "0\t0") == 0) {
-					p = "=";
+					p = "";
 				} else {
 					next = tmp;
 					const char* rmt = split(&next, '\t');
