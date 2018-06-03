@@ -11,6 +11,7 @@
 typedef struct {
 	const char* user;
 	const char* host;
+	const char* pwd;
 	const char* cwd;
 	int error;
 } prompt_data;
@@ -198,6 +199,13 @@ void cwd_section(const prompt_data* data) {
 	append(sdir, NULL);
 }
 
+void access_section(const prompt_data* data) {
+	if (access(data->pwd, W_OK)) {
+		section("254", "127");
+		append("\ue0a2", NULL);
+	}
+}
+
 void status_section(const prompt_data* data) {
 	section(data->error ? "160" : "40", "0");
 	append("$", NULL);
@@ -205,7 +213,7 @@ void status_section(const prompt_data* data) {
 
 void ssh_section() {
 	if (getenv("SSH_CLIENT")) {
-		section("254", "166");
+		section("254", "172");
 		append("\u26a1", NULL);
 	}
 }
@@ -343,7 +351,7 @@ int main(int argc, char** argv, char** envp) {
 	uname(&name);
 
 	data.user = getenv("USER");
-	data.cwd = getenv("PWD");
+	data.pwd = data.cwd = getenv("PWD");
 	data.host = name.nodename;
 	data.error = argc == 2 && strcmp(argv[1], "0") != 0;
 
@@ -360,6 +368,7 @@ int main(int argc, char** argv, char** envp) {
 	user_host_section(&data);
 	ssh_section();
 	cwd_section(&data);
+	access_section(&data);
 	git_section();
 	status_section(&data);
 	final_section();
