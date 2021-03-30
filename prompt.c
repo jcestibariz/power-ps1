@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
@@ -218,6 +219,16 @@ void ssh_section() {
 	}
 }
 
+void venv_section() {
+	const char* venv = getenv("VIRTUAL_ENV");
+	if (venv) {
+		char tmp[PATH_MAX];
+		strcpy(tmp, venv);
+		section("0", "2");
+		append("\U0001f40d", basename(tmp), NULL);
+	}
+}
+
 void git_section() {
 	char rpbuf[256];
 	int status = readp(rev_parse, 0, rpbuf, sizeof rpbuf);
@@ -369,6 +380,7 @@ int main(int argc, char** argv, char** envp) {
 	ssh_section();
 	cwd_section(&data);
 	access_section(&data);
+	venv_section();
 	git_section();
 	status_section(&data);
 	final_section();
